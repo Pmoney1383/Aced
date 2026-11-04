@@ -3,7 +3,7 @@
 // so every clone fetches its own copy. If a download fails the app falls back to an animated avatar.
 const fs = require('fs');
 const path = require('path');
-const IDS = [4834, 42323, 37031];
+const IDS = [4834, 42323, 37031, 4833, 10443, 41272, 2960];
 const dir = path.join(__dirname, '..', 'assets', 'interviewers');
 (async () => {
   fs.mkdirSync(dir, { recursive: true });

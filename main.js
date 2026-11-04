@@ -8,7 +8,7 @@ function send(route) { if (win) win.webContents.send('navigate', route); }
 function createWindow() {
   win = new BrowserWindow({
     width: 1200, height: 800, minWidth: 920, minHeight: 640,
-    backgroundColor: '#f5f5f7', title: 'Aced',
+    backgroundColor: '#0b0e1f', title: 'Aced', icon: path.join(__dirname, 'build', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true }
   });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));

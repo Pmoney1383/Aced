@@ -8,9 +8,41 @@
     "start": "electron .",
     "fetch-videos": "node scripts/fetch-videos.js",
     "postinstall": "node scripts/fetch-videos.js",
-    "test:data": "node scripts/check-data.js"
+    "test:data": "node scripts/check-data.js",
+    "dist": "electron-builder --win nsis"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "author": "Aced",
+  "build": {
+    "appId": "com.aced.app",
+    "productName": "Aced",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "data/**/*",
+      "assets/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Aced",
+      "runAfterFinish": true
+    }
   }
 }

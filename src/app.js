@@ -249,6 +249,7 @@
     if (settings.record && navigator.mediaDevices) {
       try { stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch { stream = null; }
     }
+    const clipOffset = Math.floor(Math.random() * Math.max(1, clips.length));
     const killSpeech = () => { try { speechSynthesis.cancel(); } catch { /* ignore */ } };
     cleanup = () => { killSpeech(); if (timer) timer.stop(); timers.forEach(clearTimeout); if (recorder && recorder.state !== 'inactive') { recorder.ondataavailable = null; recorder.onstop = null; try { recorder.stop(); } catch { /* ignore */ } } if (stream) stream.getTracks().forEach((t) => t.stop()); };
 
@@ -256,7 +257,7 @@
 
     function ask() {
       const q = qs[i];
-      const clip = clips.length ? clips[i % clips.length] : null;
+      const clip = clips.length ? clips[(i + clipOffset) % clips.length] : null;
       main.innerHTML = `<div class="wrap"><div class="topbar"><div class="grow"><div class="cat">${esc(q.cat)} · Question ${i + 1} of ${qs.length}</div><div class="progress"><i style="width:${(i / qs.length) * 100}%"></i></div></div></div>
         <div class="stage"><div class="screen" id="screen">${clip ? `<video id="vid" src="../assets/interviewers/${clip}" muted loop playsinline></video>` : avatar}${stream ? '<video id="cam" class="pip" muted autoplay playsinline></video>' : ''}<span class="tag" id="tag">Interviewer</span><div class="cap" id="cap">${esc(q.text)}</div></div>
         <div class="stack"><div class="qcard"><div class="row" style="justify-content:space-between"><b class="phase" id="phase">Listen to the question</b><div id="rwrap"></div></div><p id="msg" class="hint" style="margin:8px 0 0">The question is shown as captions.</p></div>

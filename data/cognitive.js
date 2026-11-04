@@ -231,6 +231,36 @@
     ['What letter comes next? A, C, F, J, …', ['M', 'N', 'O', 'P'], 2, 'Gaps grow: +2, +3, +4, +5 → J + 5 = O.']
   ].forEach(([p, o, a, e]) => { const w = withOptions(o[a], o.filter((_, i) => i !== a)); H(L, p, w.options, w.answer, e); });
 
+
+  /* ---------- 8. Extra hand-written set (25) ---------- */
+  const seriesVisual = (t) => `<div class="series">${t.map((x) => `<span>${x}</span>`).join('')}<span class="q">?</span></div>`;
+  const X = (cat, prompt, correct, wrongs, explain, visual) => { const w = withOptions(correct, wrongs); add({ cat, prompt, visual, options: w.options, answer: w.answer, explain }); };
+  X('Number Series', 'What number comes next in the series?', '95', ['94', '96', '99'], 'Each number doubles and adds 1. 47 × 2 + 1 = 95.', seriesVisual([5, 11, 23, 47]));
+  X('Number Series', 'What number comes next in the series?', '37', ['36', '38', '41'], 'The differences are 3, 5, 7, 9, then 11 (the numbers are n² + 1). 26 + 11 = 37.', seriesVisual([2, 5, 10, 17, 26]));
+  X('Number Series', 'Complete the sequence.', '6', ['4', '8', '10'], 'Each term is divided by 2, so 12 ÷ 2 = 6.', seriesVisual([96, 48, 24, 12]));
+  X('Number Series', 'What number comes next in the series?', '36', ['35', '37', '40'], 'Consecutive squares: 2², 3², 4², 5², then 6² = 36.', seriesVisual([4, 9, 16, 25]));
+  X('Number Series', 'Find the next number.', '8', ['7', '9', '10'], 'Each term is the sum of the previous two: 3 + 5 = 8.', seriesVisual([1, 1, 2, 3, 5]));
+  X('Number Series', 'Which letter comes next?', 'Z', ['W', 'X', 'Y'], 'Letter positions increase by 3, 4, 5, 6, then 7. S is position 19; 19 + 7 = 26, which is Z.', seriesVisual(['A', 'D', 'H', 'M', 'S']));
+  X('Logic', 'Which number does NOT belong with the others?', '30', ['9', '16', '25'], '9, 16 and 25 are perfect squares. 30 is not.');
+  X('Numerical Reasoning', 'A red tile is worth 6 points and a blue tile is worth 4. What is the total for 3 red tiles and 2 blue tiles?', '26', ['24', '22', '28'], '3 × 6 + 2 × 4 = 18 + 8 = 26.');
+  X('Numerical Reasoning', 'What is 25% of 280?', '70', ['60', '65', '75'], '25% is one quarter, and 280 ÷ 4 = 70.');
+  X('Numerical Reasoning', 'A $120 product is discounted by 15%. What is the new price?', '$102', ['$98', '$105', '$108'], '15% of $120 is $18. $120 − $18 = $102.');
+  X('Numerical Reasoning', 'Eight workers can complete a job in 6 hours. Assuming equal rates, how long would four workers take?', '12 hours', ['3 hours', '8 hours', '9 hours'], 'The job takes 8 × 6 = 48 worker-hours. With four workers, 48 ÷ 4 = 12 hours.');
+  X('Numerical Reasoning', 'Six identical pens cost $9. How much do ten cost?', '$15', ['$13.50', '$14', '$16'], 'Each pen costs $1.50, so ten cost $15.');
+  X('Numerical Reasoning', 'The average of four numbers is 21. Three of the numbers are 12, 18 and 24. What is the fourth?', '30', ['27', '28', '32'], 'The total must be 84. Subtract 12 + 18 + 24 = 54, leaving 30.');
+  X('Numerical Reasoning', 'A team has engineers and designers in a 3:2 ratio. There are 55 people in total. How many are engineers?', '33', ['22', '30', '35'], 'Engineers are 3 of 5 equal parts: 55 × 3/5 = 33.');
+  X('Numerical Reasoning', 'A vehicle travels 150 km at a constant 60 km/h. How long does the trip take?', '2.5 hours', ['2 hours', '2.25 hours', '3 hours'], 'Time = distance ÷ speed = 150 ÷ 60 = 2.5 hours.');
+  X('Logic', 'All architects are employees. No employees are contractors. Which statement must be true?', 'No architects are contractors', ['All employees are architects', 'Some contractors are architects', 'All contractors are employees'], 'Every architect is an employee, and employees cannot be contractors, so no architect can be a contractor.');
+  X('Logic', 'Some teams use Python. All teams that use Python automate testing. Which conclusion must be true?', 'Some teams automate testing', ['Every automated test uses Python', 'All teams use Python', 'No team automates testing'], 'At least some teams use Python, and every such team automates testing. So some teams automate testing.');
+  X('Logic', 'If a transfer succeeds, a confirmation email is sent. No confirmation email was sent. What follows?', 'The transfer did not succeed', ['The transfer succeeded', 'The email was delayed', 'Nothing can be concluded'], 'This is modus tollens: success implies an email, so no email implies no success.');
+  X('Logic', 'Every deployed project must pass a security review. Project Delta was deployed. What must be true?', 'Delta passed the security review', ['Delta failed the security review', 'Delta was deployed before the review', 'Nothing can be concluded'], 'Deployment requires passing the review. Delta was deployed, so it must have passed.');
+  X('Logic', 'Only employees with active badges may enter a laboratory. Jamie entered, and the rule was followed. What must be true?', 'Jamie is an employee with an active badge', ['Jamie is a laboratory manager', 'Every badge holder entered the laboratory', 'Jamie has worked in the laboratory before'], 'Being an employee with an active badge is the necessary condition for entry.');
+  X('Verbal Reasoning', 'Blueprint is to building as recipe is to …', 'Dish', ['Chef', 'Kitchen', 'Ingredient'], 'A blueprint guides construction of a building, as a recipe guides preparation of a dish.');
+  X('Verbal Reasoning', 'Which word is the closest OPPOSITE of "concise"?', 'Wordy', ['Brief', 'Clear', 'Accurate'], 'Concise means brief and direct. Wordy means using more words than necessary.');
+  X('Logic', 'L finishes before M. M finishes before N. N finishes before P. Who finishes first?', 'L', ['M', 'N', 'P'], 'The complete order is L, M, N, P, so L finishes first.');
+  X('Numerical Reasoning', 'Complete the analogy: 4 : 16 :: 7 : ?', '49', ['28', '32', '64'], 'The second number is the square of the first. 7² = 49.');
+  X('Data Interpretation', 'A support team resolves tickets each day (chart). How many more tickets were resolved on Tuesday and Thursday combined than on Monday and Wednesday combined?', '12', ['8', '14', '26'], 'Tuesday + Thursday = 18 + 20 = 38. Monday + Wednesday = 14 + 12 = 26. Difference = 12.', chartSvg(['Mon', 'Tue', 'Wed', 'Thu'], [14, 18, 12, 20]));
+
   out.forEach((q, i) => { q.id = 'cog-' + String(i + 1).padStart(3, '0'); });
   root.COGNITIVE = out;
   if (typeof module !== 'undefined') module.exports = out;
