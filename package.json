@@ -1,0 +1,16 @@
+{
+  "name": "aced",
+  "version": "0.1.0",
+  "description": "Aced - practice for cognitive tests, one-way video interviews and technical questions.",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "fetch-videos": "node scripts/fetch-videos.js",
+    "postinstall": "node scripts/fetch-videos.js",
+    "test:data": "node scripts/check-data.js"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

@@ -1,0 +1,4 @@
+node_modules/
+dist/
+assets/interviewers/*.mp4
+*.log

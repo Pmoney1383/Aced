@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: file:; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aced</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar" aria-label="Sections">
+      <div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Aced</span></div>
+      <div class="group-label">Practice</div>
+      <button class="nav" data-route="home"><span class="ic" data-ic="home"></span>Home</button>
+      <button class="nav" data-route="cognitive"><span class="ic" data-ic="brain"></span>Cognitive tests<kbd>Ctrl 1</kbd></button>
+      <button class="nav" data-route="interview"><span class="ic" data-ic="video"></span>Video interview<kbd>Ctrl 2</kbd></button>
+      <button class="nav" data-route="technical"><span class="ic" data-ic="code"></span>Technical<kbd>Ctrl 3</kbd></button>
+      <div class="spacer"></div>
+      <button class="nav" data-route="settings"><span class="ic" data-ic="gear"></span>Settings<kbd>Ctrl ,</kbd></button>
+    </nav>
+    <main id="main" tabindex="-1"></main>
+  </div>
+  <script src="../data/cognitive.js"></script>
+  <script src="../data/interview.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
