@@ -1,16 +1,22 @@
-const { app, BrowserWindow, Menu, ipcMain, session, shell } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, session, shell, nativeTheme } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 let win;
 function send(route) { if (win) win.webContents.send('navigate', route); }
 
+const overlay = () => (nativeTheme.shouldUseDarkColors
+  ? { color: '#0b0e1f', symbolColor: '#f2f4ff', height: 40 }
+  : { color: '#eceff8', symbolColor: '#10142b', height: 40 });
+
 function createWindow() {
   win = new BrowserWindow({
     width: 1200, height: 800, minWidth: 920, minHeight: 640,
-    backgroundColor: '#0b0e1f', title: 'Aced', icon: path.join(__dirname, 'build', 'icon.png'),
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0b0e1f' : '#eceff8', title: 'Aced', titleBarStyle: 'hidden', titleBarOverlay: overlay(), autoHideMenuBar: true, icon: path.join(__dirname, 'build', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true }
   });
+  win.setMenuBarVisibility(false);
+  nativeTheme.on('updated', () => { try { win.setTitleBarOverlay(overlay()); win.setBackgroundColor(nativeTheme.shouldUseDarkColors ? '#0b0e1f' : '#eceff8'); } catch { /* ignore */ } });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
   if (process.env.ACED_DEBUG) win.webContents.on('console-message', (_e, lvl, msg, line, src) => console.log(`[renderer:${lvl}] ${msg} (${src}:${line})`));
@@ -48,6 +54,23 @@ ipcMain.handle('results:save', (_e, session) => {
   return { file, dir };
 });
 ipcMain.handle('results:open', () => { const d = resultsDir(); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
+ipcMain.on('win:action', (e, a) => {
+  const w = BrowserWindow.fromWebContents(e.sender); if (!w) return; const wc = w.webContents;
+  switch (a) {
+    case 'minimize': w.minimize(); break;
+    case 'maximize': w.isMaximized() ? w.unmaximize() : w.maximize(); break;
+    case 'close': w.close(); break;
+    case 'quit': app.quit(); break;
+    case 'reload': wc.reload(); break;
+    case 'devtools': wc.toggleDevTools(); break;
+    case 'zoomIn': wc.setZoomLevel(wc.getZoomLevel() + 0.5); break;
+    case 'zoomOut': wc.setZoomLevel(wc.getZoomLevel() - 0.5); break;
+    case 'zoomReset': wc.setZoomLevel(0); break;
+    case 'fullscreen': w.setFullScreen(!w.isFullScreen()); break;
+    case 'undo': wc.undo(); break; case 'redo': wc.redo(); break; case 'cut': wc.cut(); break;
+    case 'copy': wc.copy(); break; case 'paste': wc.paste(); break; case 'selectAll': wc.selectAll(); break;
+  }
+});
 ipcMain.handle('interviewers:list', () => {
   const dir = path.join(__dirname, 'assets', 'interviewers');
   try { return fs.readdirSync(dir).filter(f => f.endsWith('.mp4')); } catch { return []; }

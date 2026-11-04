@@ -424,5 +424,46 @@
     ask();
   }
 
+  /* ---------- custom title-bar menus ---------- */
+  const A = (a) => () => window.aced && window.aced.action(a);
+  const MENUS = {
+    File: [['Settings…', 'Ctrl+,', () => go('settings')], '-', ['Quit', '', A('quit')]],
+    Practice: [['Home', 'Ctrl+0', () => go('home')], ['Cognitive tests', 'Ctrl+1', () => go('cognitive')], ['Video interview', 'Ctrl+2', () => go('interview')], ['Technical questions', 'Ctrl+3', () => go('technical')]],
+    Edit: [['Undo', 'Ctrl+Z', A('undo')], ['Redo', 'Ctrl+Y', A('redo')], '-', ['Cut', 'Ctrl+X', A('cut')], ['Copy', 'Ctrl+C', A('copy')], ['Paste', 'Ctrl+V', A('paste')], ['Select all', 'Ctrl+A', A('selectAll')]],
+    View: [['Reload', 'Ctrl+R', A('reload')], ['Developer tools', 'Ctrl+Shift+I', A('devtools')], '-', ['Actual size', '', A('zoomReset')], ['Zoom in', 'Ctrl++', A('zoomIn')], ['Zoom out', 'Ctrl+-', A('zoomOut')], '-', ['Full screen', 'F11', A('fullscreen')]],
+    Window: [['Minimize', '', A('minimize')], ['Maximize / Restore', '', A('maximize')], ['Close', 'Alt+F4', A('close')]]
+  };
+  (function buildMenus() {
+    const bar = $('#menubar'); let open = null, dd = null;
+    const close = () => { if (dd) dd.remove(); dd = null; if (open) open.setAttribute('aria-expanded', 'false'); open = null; };
+    const show = (btn, name) => {
+      close(); open = btn; btn.setAttribute('aria-expanded', 'true');
+      dd = document.createElement('div'); dd.className = 'dropdown'; dd.setAttribute('role', 'menu'); dd.style.left = btn.getBoundingClientRect().left + 'px';
+      MENUS[name].forEach((it) => {
+        if (it === '-') { dd.appendChild(document.createElement('hr')); return; }
+        const b = document.createElement('button'); b.setAttribute('role', 'menuitem');
+        b.innerHTML = `<span>${it[0]}</span><kbd>${it[1]}</kbd>`;
+        b.addEventListener('click', () => { close(); it[2](); }); dd.appendChild(b);
+      });
+      document.body.appendChild(dd); dd.querySelector('button').focus();
+    };
+    Object.keys(MENUS).forEach((name) => {
+      const b = document.createElement('button'); b.className = 'tb-btn'; b.textContent = name; b.setAttribute('role', 'menuitem'); b.setAttribute('aria-haspopup', 'true'); b.setAttribute('aria-expanded', 'false');
+      b.addEventListener('click', () => (open === b ? close() : show(b, name)));
+      b.addEventListener('mouseenter', () => { if (open && open !== b) show(b, name); });
+      bar.appendChild(b);
+    });
+    document.addEventListener('mousedown', (e) => { if (dd && !dd.contains(e.target) && !bar.contains(e.target)) close(); });
+    document.addEventListener('keydown', (e) => {
+      if (!dd) return;
+      const items = [...dd.querySelectorAll('button')], idx = items.indexOf(document.activeElement);
+      if (e.key === 'Escape') { const o = open; close(); o && o.focus(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(idx - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const bs = [...bar.children], k = bs.indexOf(open), nb = bs[(k + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; show(nb, nb.textContent); }
+    });
+    window.addEventListener('blur', close);
+  })();
+
   go('home');
 })();
