@@ -29,7 +29,9 @@
   const add = (q) => out.push(q);
 
   /* ---------- 1. Number series (20, generated) ---------- */
-  for (let n = 0; n < 20; n++) {
+  const HAND_SERIES = [[5, 11, 23, 47], [2, 5, 10, 17, 26], [96, 48, 24, 12], [4, 9, 16, 25], [1, 1, 2, 3, 5]].map((a) => a.join(','));
+  const seenSeries = [];
+  for (let n = 0, tries = 0; n < 20 && tries < 600; tries++) {
     const type = n % 8;
     let terms = [], ans, why;
     if (type === 0) { const a = ri(2, 30), d = ri(2, 9); terms = [0, 1, 2, 3, 4, 5].map((i) => a + d * i); ans = a + d * 6; why = `Each term adds ${d}.`; }
@@ -40,6 +42,9 @@
     else if (type === 5) { const a = ri(1, 5), b = ri(2, 6); terms = [a, b]; for (let i = 0; i < 4; i++) terms.push(terms[i] + terms[i + 1]); ans = terms[4] + terms[5]; why = 'Each term is the sum of the previous two.'; }
     else if (type === 6) { let x = ri(2, 5); terms = [x]; for (let i = 0; i < 4; i++) { x = 2 * x - 1; terms.push(x); } ans = 2 * x - 1; why = 'Each term is double the previous term, minus 1.'; }
     else { const s = ri(2, 5), a = ri(2, 6); let x = s; terms = [x]; for (let i = 0; i < 5; i++) { x = i % 2 === 0 ? x + a : x * 2; terms.push(x); } ans = terms[5] * 2; why = `Operations alternate: +${a}, ×2, +${a}, ×2, …`; }
+    const key = terms.join(',');
+    if ([...HAND_SERIES, ...seenSeries].some((k) => k.startsWith(key) || key.startsWith(k))) continue;
+    seenSeries.push(key); n++;
     const o = withOptions(ans, numDistractors(ans));
     add({ cat: 'Number Series', prompt: 'What number comes next in the series?', visual: `<div class="series">${terms.map((t) => `<span>${t}</span>`).join('')}<span class="q">?</span></div>`, options: o.options, answer: o.answer, explain: why });
   }
@@ -58,14 +63,16 @@
     return xs.map((x) => shapeEl(c.shape, x, 45, c.size, c.fill)).join('');
   }
   const frame = (inner, x = 0, y = 0) => `<g transform="translate(${x} ${y})"><rect x="1" y="1" width="88" height="88" rx="8" class="cell"/>${inner}</g>`;
-  for (let n = 0; n < 20; n++) {
+  const seenMatrix = new Set();
+  for (let n = 0, tries = 0; n < 20 && tries < 600; tries++) {
     const mode = n % 2 === 0 ? 'count' : 'size';
-    const checker = n % 4 < 2;
+    const checker = (n >> 1) % 2 === 0;
+    const rev = (n >> 2) % 2 === 1;
     const shapes = shuffle(SHAPES).slice(0, 3);
     const spec = (r, c) => ({
       shape: shapes[r],
-      count: mode === 'count' ? c + 1 : 1,
-      size: mode === 'count' ? 9 : [9, 14, 19][c],
+      count: mode === 'count' ? (rev ? 3 - c : c + 1) : 1,
+      size: mode === 'count' ? 9 : [9, 14, 19][rev ? 2 - c : c],
       fill: checker ? (r + c) % 2 === 0 : false
     });
     let cells = '';
@@ -73,12 +80,15 @@
       if (r === 2 && c === 2) cells += frame('<text x="45" y="58" text-anchor="middle" class="qmark">?</text>', c * 96, r * 96);
       else cells += frame(cellSvg(spec(r, c)), c * 96, r * 96);
     }
+    const mKey = cells;
+    if (seenMatrix.has(mKey)) continue;
+    seenMatrix.add(mKey); n++;
     const correct = spec(2, 2);
     const other = shapes.length ? SHAPES.filter((s) => s !== correct.shape) : [];
     const muts = [
       { ...correct, shape: pick(other) },
       { ...correct, fill: !correct.fill },
-      mode === 'count' ? { ...correct, count: 2 } : { ...correct, size: 14 }
+      mode === 'count' ? { ...correct, count: correct.count === 2 ? 3 : 2 } : { ...correct, size: correct.size === 14 ? 19 : 14 }
     ];
     if (!checker) muts[1] = { ...correct, shape: other.find((s) => s !== muts[0].shape) };
     const keys = new Set([JSON.stringify(correct)]);
@@ -92,7 +102,7 @@
       optionsSvg: opts.map((o) => `<svg viewBox="0 0 90 90" class="opt-svg" aria-hidden="true"><rect x="1" y="1" width="88" height="88" rx="8" class="cell"/>${cellSvg(o)}</svg>`),
       options: opts.map((_, i) => 'Option ' + 'ABCD'[i]),
       answer: opts.findIndex((o) => JSON.stringify(o) === JSON.stringify(correct)),
-      explain: `Reading across each row, the ${mode === 'count' ? 'number of shapes goes up 1, 2, 3' : 'shape size grows small, medium, large'}; each row keeps its own shape${checker ? ', and fill alternates like a checkerboard' : ''}.`
+      explain: `Reading across each row, the ${mode === 'count' ? (rev ? 'number of shapes goes down 3, 2, 1' : 'number of shapes goes up 1, 2, 3') : (rev ? 'shape size shrinks large, medium, small' : 'shape size grows small, medium, large')}; each row keeps its own shape${checker ? ', and fill alternates like a checkerboard' : ''}.`
     });
   }
 
@@ -224,7 +234,7 @@
     ['A is taller than B. C is shorter than B. Who is the tallest?', ['A', 'B', 'C', 'Cannot be determined'], 0, 'A > B > C.'],
     ['If it rains, the match is cancelled. The match was NOT cancelled. What follows?', ['It rained', 'It did not rain', 'Nothing can be said', 'The match was moved'], 1, 'Contrapositive: no cancellation means no rain.'],
     ['Sam stands left of Tia, and Tia stands left of Uma. Who is furthest right?', ['Sam', 'Tia', 'Uma', 'Cannot be determined'], 2, 'Order: Sam, Tia, Uma.'],
-    ['At 3:15, what is the angle between the hour and minute hands?', ['0°', '7.5°', '15°', '22.5°'], 1, 'The hour hand has moved 7.5° past the 3.'],
+    ['At 3:15, what is the angle between the hour and minute hands?', ['0°', '7.5°', '15°', '22.5°'], 1, 'At 3:15 the minute hand points exactly at the 3 (90°), but the hour hand has crept a quarter of the way from 3 toward 4: 3 × 30° + 15 × 0.5° = 97.5°. The gap is 97.5° − 90° = 7.5°, so the hands are close but do not overlap.'],
     ['The day after tomorrow is Friday. What day was yesterday?', ['Monday', 'Tuesday', 'Wednesday', 'Thursday'], 1, 'Today is Wednesday, so yesterday was Tuesday.'],
     ['Alice is older than Bob. Bob is older than Carol. Dan is younger than Carol. Who is second oldest?', ['Alice', 'Bob', 'Carol', 'Dan'], 1, 'Order: Alice, Bob, Carol, Dan.'],
     ['If CAT is coded 3-1-20, how is DOG coded?', ['4-15-7', '4-14-7', '3-15-7', '4-15-8'], 0, 'Letters map to alphabet positions: D=4, O=15, G=7.'],
@@ -249,7 +259,6 @@
   X('Numerical Reasoning', 'Six identical pens cost $9. How much do ten cost?', '$15', ['$13.50', '$14', '$16'], 'Each pen costs $1.50, so ten cost $15.');
   X('Numerical Reasoning', 'The average of four numbers is 21. Three of the numbers are 12, 18 and 24. What is the fourth?', '30', ['27', '28', '32'], 'The total must be 84. Subtract 12 + 18 + 24 = 54, leaving 30.');
   X('Numerical Reasoning', 'A team has engineers and designers in a 3:2 ratio. There are 55 people in total. How many are engineers?', '33', ['22', '30', '35'], 'Engineers are 3 of 5 equal parts: 55 × 3/5 = 33.');
-  X('Numerical Reasoning', 'A vehicle travels 150 km at a constant 60 km/h. How long does the trip take?', '2.5 hours', ['2 hours', '2.25 hours', '3 hours'], 'Time = distance ÷ speed = 150 ÷ 60 = 2.5 hours.');
   X('Logic', 'All architects are employees. No employees are contractors. Which statement must be true?', 'No architects are contractors', ['All employees are architects', 'Some contractors are architects', 'All contractors are employees'], 'Every architect is an employee, and employees cannot be contractors, so no architect can be a contractor.');
   X('Logic', 'Some teams use Python. All teams that use Python automate testing. Which conclusion must be true?', 'Some teams automate testing', ['Every automated test uses Python', 'All teams use Python', 'No team automates testing'], 'At least some teams use Python, and every such team automates testing. So some teams automate testing.');
   X('Logic', 'If a transfer succeeds, a confirmation email is sent. No confirmation email was sent. What follows?', 'The transfer did not succeed', ['The transfer succeeded', 'The email was delayed', 'Nothing can be concluded'], 'This is modus tollens: success implies an email, so no email implies no success.');

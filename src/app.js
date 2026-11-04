@@ -108,9 +108,10 @@
   let cogSel = { cats: null };
   function shuffled(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   // balanced pick: round-robin across areas so every test mixes puzzle types
+  const qSig = (q) => (q.type ? q.type + (q.seq || q.digits) : q.prompt + '|' + (q.visual || '') + '|' + (q.options || []).slice().sort().join('/'));
   function pickBalanced(pool, n) {
-    const by = {};
-    shuffled(pool).forEach((q) => (by[q.cat] = by[q.cat] || []).push(q));
+    const by = {}, seen = new Set();
+    shuffled(pool).forEach((q) => { const k = qSig(q); if (seen.has(k)) return; seen.add(k); (by[q.cat] = by[q.cat] || []).push(q); });
     const lists = shuffled(Object.values(by)), out = [];
     while (out.length < n && lists.some((l) => l.length)) lists.forEach((l) => { if (l.length && out.length < n) out.push(l.shift()); });
     return shuffled(out);
