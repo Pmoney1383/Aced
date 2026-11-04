@@ -248,6 +248,29 @@
     const rightText = (q) => (q.type === 'grid' ? q.seq.map((x) => x + 1).join(' → ') : q.type === 'digits' ? (q.reverse ? q.digits.split('').reverse().join('') : q.digits) : q.options[q.answer]);
     const gradeOf = (p) => (p >= 90 ? 'A' : p >= 80 ? 'B' : p >= 70 ? 'C' : p >= 60 ? 'D' : 'F');
 
+    const reviewHtml = (a, k) => {
+      const q = a.q;
+      let body = `<p class="rv-prompt">${esc(q.prompt)}</p>`;
+      if (q.type === 'grid') {
+        const taps = a.chosen || [];
+        body += `<div class="visual"><div class="mem rv">${Array.from({ length: 9 }, (_, c) => { const pos = q.seq.indexOf(c), tapped = taps.indexOf(c); return `<div class="rvcell${pos >= 0 ? ' want' : ''}${tapped >= 0 ? (pos === tapped ? ' got' : ' miss') : ''}"><b>${c + 1}</b><small>${pos >= 0 ? 'correct #' + (pos + 1) : ''}${tapped >= 0 ? (pos >= 0 ? ' · ' : '') + 'you #' + (tapped + 1) : ''}</small></div>`; }).join('')}</div></div>`;
+      } else if (q.type === 'digits') {
+        body += `<div class="visual"><div class="digits" style="font-size:32px">${q.digits.split('').join(' ')}</div></div>`;
+      } else if (q.visual) body += `<div class="visual">${q.visual}</div>`;
+      if (q.options) {
+        body += `<div class="rv-opts">${q.options.map((o, i) => {
+          const isRight = i === q.answer, isYou = a.chosen === i;
+          const tag = isRight && isYou ? '<span class="rv-tag ok">Your answer · Correct</span>' : isRight ? '<span class="rv-tag ok">Correct answer</span>' : isYou ? '<span class="rv-tag bad">Your answer</span>' : '';
+          return `<div class="rv-opt${isRight ? ' right' : ''}${isYou && !isRight ? ' wrong' : ''}"><span class="key">${'ABCDEFGH'[i]}</span>${q.optionsSvg ? q.optionsSvg[i] : ''}<span class="rv-text">${esc(o)}</span>${tag}</div>`;
+        }).join('')}</div>`;
+        if (a.chosen == null) body += `<p class="hint">You did not answer in time.</p>`;
+      } else {
+        body += `<p><b>You:</b> ${esc(yourText(a))}<br><b>Correct:</b> ${esc(rightText(q))}</p>`;
+      }
+      body += `<div class="tip"><b>Why:</b> ${esc(q.explain)}</div>`;
+      return `<details class="rev"${a.correct ? '' : ' open'}><summary><span class="rv-mark ${a.correct ? 'ok' : 'bad'}">${a.correct ? '✓' : '✗'}</span><span>${k + 1}. ${esc(q.cat)}${a.timedOut ? ' (timed out)' : ''} <small class="hint">· ${a.secs || 0} s</small></span></summary>${body}</details>`;
+    };
+
     function results() {
       clearAll();
       const n = qs.length, right = answers.filter((a) => a.correct).length, pct = Math.round((right / n) * 100), grade = gradeOf(pct);
@@ -279,7 +302,7 @@
       main.innerHTML = `<div class="wrap stack"><div class="row" style="gap:28px;align-items:flex-end"><div><div class="cat">Graded</div><div class="score">${pct}%</div></div><div><div class="score" style="font-size:64px;color:var(--ink)">${grade}</div></div><p class="lede" style="margin:0">${right} of ${n} correct · ${timedOut} timed out</p></div>
         <div class="card"><h2>Feedback</h2><ul style="margin:0;padding-left:20px;display:grid;gap:8px">${fb.map((f) => `<li>${esc(f)}</li>`).join('')}</ul></div>
         <div class="card"><h2>By area</h2><table class="bd">${areas.map((a) => `<tr><td>${esc(a.c)} <span class="pill">${Math.round(a.avg)} s avg</span></td><td>${a.right} / ${a.total}</td></tr>`).join('')}</table></div>
-        <div class="card"><h2>Review every question</h2>${answers.map((a, k) => `<details class="rev"><summary><span>${a.correct ? '✓' : '✗'}</span><span>${k + 1}. ${esc(a.q.cat)}${a.timedOut ? ' (timed out)' : ''}</span></summary><p>${esc(a.q.prompt)}</p>${a.q.visual ? `<div class="visual">${a.q.visual}</div>` : ''}<p><b>You:</b> ${esc(yourText(a))}<br><b>Correct:</b> ${esc(rightText(a.q))}</p><p><b>Why:</b> ${esc(a.q.explain)}</p></details>`).join('')}</div>
+        <div class="card"><h2>Review every question</h2><p class="hint">Wrong answers are expanded. Tap any row to open or close it.</p>${answers.map((a, k) => reviewHtml(a, k)).join('')}</div>
         <div class="card"><h2>Your answers are saved</h2><p class="hint" id="saved">Saving…</p><div class="row"><button class="btn" id="copy">Copy summary to share with Claude</button><button class="btn" id="openf">Open results folder</button></div></div>
         <div class="row"><button class="btn primary lg" id="again">New test</button><button class="btn lg" id="home">Home</button></div></div>`;
       $('#again').addEventListener('click', () => go('cognitive')); $('#home').addEventListener('click', () => go('home'));

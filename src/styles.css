@@ -176,3 +176,20 @@ input[type=range] { -webkit-appearance: none; appearance: none; height: 24px; ba
 input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 50%) 100% no-repeat, var(--surface2); }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -7px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.35); }
 input[type=range]:focus-visible { outline: none; } input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent); }
+
+/* review */
+.rv-prompt { font: 600 17px/1.4 var(--display); margin: 10px 0; }
+.rv-mark { font-weight: 800; } .rv-mark.ok { color: var(--ok); } .rv-mark.bad { color: var(--signal); }
+.rv-opts { display: grid; gap: 8px; margin: 10px 0; }
+.rv-opt { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: var(--bg); border: 2px solid transparent; font-weight: 500; }
+.rv-opt .key { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--surface); color: var(--ink2); }
+.rv-opt .opt-svg { width: 72px; height: 72px; flex: none; }
+.rv-opt .rv-text { flex: 1; }
+.rv-opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.rv-opt.wrong { border-color: var(--signal); background: var(--bad-soft); }
+.rv-tag { flex: none; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.rv-tag.ok { background: var(--ok); color: var(--bg); } .rv-tag.bad { background: var(--signal); color: #fff; }
+.mem.rv { grid-template-columns: repeat(3, 92px); }
+.rvcell { height: 92px; border-radius: 16px; background: var(--surface); display: grid; place-content: center; text-align: center; gap: 2px; border: 2px solid transparent; }
+.rvcell b { font-size: 16px; } .rvcell small { font-size: 11px; color: var(--ink2); }
+.rvcell.want { border-color: var(--ok); background: var(--ok-soft); } .rvcell.miss { border-color: var(--signal); background: var(--bad-soft); }
