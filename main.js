@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain, session, shell, nativeTheme } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, session, shell, nativeTheme, clipboard } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -53,6 +53,7 @@ ipcMain.handle('results:save', (_e, session) => {
   fs.writeFileSync(path.join(dir, `latest-${kind}.json`), body);
   return { file, dir };
 });
+ipcMain.handle('clipboard:write', (_e, text) => { clipboard.writeText(String(text || '')); return true; });
 ipcMain.handle('results:open', () => { const d = resultsDir(); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 ipcMain.on('win:action', (e, a) => {
   const w = BrowserWindow.fromWebContents(e.sender); if (!w) return; const wc = w.webContents;

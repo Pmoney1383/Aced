@@ -311,7 +311,7 @@
         window.aced.saveResult(session).then((r) => { savedPath = r.file; $('#saved').textContent = 'Saved to ' + r.file + ' (also latest-cognitive.json). Tell Claude "check my latest Aced results" and it can read them.'; }).catch(() => { $('#saved').textContent = 'Could not save results to disk.'; });
         $('#openf').addEventListener('click', () => window.aced.openResults());
       }
-      $('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(summaryText + (savedPath ? ' Full file: ' + savedPath : '')); $('#copy').textContent = 'Copied'; } catch { $('#copy').textContent = 'Copy failed'; } });
+      $('#copy').addEventListener('click', async () => { const t = summaryText + (savedPath ? ' Full file: ' + savedPath : ''); try { if (window.aced && window.aced.copyText) await window.aced.copyText(t); else await navigator.clipboard.writeText(t); $('#copy').textContent = 'Copied to clipboard'; setTimeout(() => { const b = $('#copy'); if (b) b.textContent = 'Copy summary to share with Claude'; }, 2500); } catch { $('#copy').textContent = 'Copy failed'; } });
     }
     show();
   }
