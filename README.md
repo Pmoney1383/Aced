@@ -24,3 +24,7 @@ Edit `data/interview.js` or `data/cognitive.js`, then `npm run test:data`.
 ## Interviewer clips
 
 Downloaded by `scripts/fetch-videos.js` under the Mixkit free licence and git-ignored (the licence forbids redistributing the raw files). See `assets/interviewers/CREDITS.md`.
+
+## Saved results
+
+Every finished cognitive test and interview session is written as JSON to `Documents\Aced\results\` (`latest-cognitive.json` is always the newest). The cognitive file holds the score, grade, feedback, per-area stats and every question with your answer, the correct answer, time taken and explanation. Use the "Copy summary" button or point an assistant at that file to get help reviewing it.

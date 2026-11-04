@@ -35,6 +35,19 @@ function buildMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
+const resultsDir = () => path.join(app.getPath('documents'), 'Aced', 'results');
+ipcMain.handle('results:save', (_e, session) => {
+  const dir = resultsDir();
+  fs.mkdirSync(dir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const kind = session && session.type === 'interview' ? 'interview' : 'cognitive';
+  const body = JSON.stringify(session, null, 2);
+  const file = path.join(dir, `${kind}-${stamp}.json`);
+  fs.writeFileSync(file, body);
+  fs.writeFileSync(path.join(dir, `latest-${kind}.json`), body);
+  return { file, dir };
+});
+ipcMain.handle('results:open', () => { const d = resultsDir(); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 ipcMain.handle('interviewers:list', () => {
   const dir = path.join(__dirname, 'assets', 'interviewers');
   try { return fs.readdirSync(dir).filter(f => f.endsWith('.mp4')); } catch { return []; }
