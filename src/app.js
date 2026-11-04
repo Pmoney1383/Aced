@@ -465,5 +465,11 @@
     window.addEventListener('blur', close);
   })();
 
+  /* range sliders: paint the filled part */
+  const syncRange = (el) => { const min = +el.min || 0, max = +el.max || 100; el.style.setProperty('--p', ((el.value - min) / (max - min)) * 100 + '%'); };
+  const syncRanges = () => document.querySelectorAll('input[type=range]').forEach(syncRange);
+  document.addEventListener('input', (e) => { if (e.target.type === 'range') syncRange(e.target); });
+  new MutationObserver(syncRanges).observe(main, { childList: true, subtree: true });
+
   go('home');
 })();

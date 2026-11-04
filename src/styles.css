@@ -163,3 +163,16 @@ body { overflow: hidden; }
 .dropdown button:hover, .dropdown button:focus-visible { background: var(--accent); color: var(--accent-ink); outline: none; }
 .dropdown kbd { font: 12px var(--font); opacity: .6; }
 .dropdown hr { border: 0; height: 1px; margin: 5px 8px; background: var(--line); }
+
+/* themed scrollbars + sliders */
+:root { color-scheme: light; --scroll: rgba(16,20,43,.22); --scroll-hover: rgba(16,20,43,.42); }
+@media (prefers-color-scheme: dark) { :root { color-scheme: dark; --scroll: rgba(242,244,255,.2); --scroll-hover: rgba(242,244,255,.4); } }
+::-webkit-scrollbar { width: 16px; height: 16px; background: transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 999px; border: 5px solid transparent; background-clip: padding-box; min-height: 48px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-hover); background-clip: padding-box; }
+::-webkit-scrollbar-button, ::-webkit-scrollbar-corner { display: none; }
+input[type=range] { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; accent-color: auto; }
+input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 50%) 100% no-repeat, var(--surface2); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -7px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+input[type=range]:focus-visible { outline: none; } input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent); }
